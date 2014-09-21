@@ -3,6 +3,7 @@ _ = require 'lodash'
 
 {spawn} = require 'child_process'
 {EventEmitter} = require 'events'
+path = require 'path'
 
 getArgs = ()-> arguments
 
@@ -18,16 +19,18 @@ class JuliaProcess extends Bacon.Bus
   constructor: (opt) ->
     super()
     startImmediately = opt?.startImmediately ? yes
+    @juliaPath = opt?.juliaPath ? '/usr/bin/julia'
     @emitter = new EventEmitter()
     _.keys(EventEmitter::)
       .filter (method) -> method isnt 'emit'
       .forEach (method) =>
         @[method] = @emitter[method].bind @emitter
     @ready = Bacon.fromEventTarget @emitter, 'ready'
+      .map -> @
     if startImmediately
       process.nextTick => @createProcess()
   createProcess: ->
-    @process = spawn '/usr/bin/julia', ['--no-startup'], cwd: process.cwd()
+    @process = spawn @juliaPath, ['--no-startup'], cwd: process.cwd()
     @_detach = @plug (
       Bacon.fromEventTarget @process.stdout, 'data'
         .skipUntil Bacon.fromEventTarget @process.stdout, 'readable'

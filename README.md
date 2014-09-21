@@ -2,6 +2,8 @@
 
 Call Julia code directly from Node.
 
+[![Build Status](http://img.shields.io/travis/baconscript/julia-bridge.svg?branch=master&style=flat)](https://travis-ci.org/baconscript/julia-bridge)
+
 ## Intended API
 
 This isn't how the code works currently, but it's where it's headed.
