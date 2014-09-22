@@ -1,3 +1,5 @@
+const BLOCK_SEPARATOR = '\n'#char(17)
+
 function stdinProducer()
   while true
     produce(read(STDIN, Char))
@@ -5,14 +7,13 @@ function stdinProducer()
 end
 
 function codeBlockProducer()
-  input = @task stdinProducer
   code = ""
-  while true
-    newChar = consume(input)
+  for newChar in Task(stdinProducer)
     if newChar == BLOCK_SEPARATOR
       produce(code)
       code = ""
     else
       code = string(code, newChar)
+    end
   end
 end

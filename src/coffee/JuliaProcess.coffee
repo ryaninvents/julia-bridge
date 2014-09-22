@@ -8,8 +8,10 @@ path = require 'path'
 getArgs = ()-> arguments
 
 # Separator for different chunks of code.
-# Unicode 0x17 &#x2417; "End of Transmission Block"
-BLOCK_SEPARATOR = "\u0017"
+# Unicode \\u0017 &#x2417; "End of Transmission Block"
+#
+# TODO: switch back to ETB; only using newline for testing
+BLOCK_SEPARATOR = "\n"#String.fromCharCode(17)
 
 module.exports =
 # # JuliaProcess
@@ -21,38 +23,63 @@ class JuliaProcess extends Bacon.Bus
     startImmediately = opt?.startImmediately ? yes
     @juliaPath = opt?.juliaPath ? '/usr/bin/julia'
     @emitter = new EventEmitter()
-    _.keys(EventEmitter::)
-      .filter (method) -> method isnt 'emit'
-      .forEach (method) =>
-        @[method] = @emitter[method].bind @emitter
-    @ready = Bacon.fromEventTarget @emitter, 'ready'
-      .map -> @
+    _.keys(EventEmitter::).forEach (method) =>
+      @[method] = @emitter[method].bind @emitter
+    ['ready','killed'].forEach (method) =>
+      @[method] = Bacon.fromEventTarget @emitter, method
+        .map => @
     if startImmediately
       process.nextTick => @createProcess()
   createProcess: ->
-    @process = spawn @juliaPath, ['--no-startup'], cwd: process.cwd()
+    @process = spawn @juliaPath, [
+      '--no-startup'
+      path.resolve __dirname, '../julia/JavaScriptBridge.jl'
+    ],
+      cwd: process.cwd()
+
     @_detach = @plug (
       Bacon.fromEventTarget @process.stdout, 'data'
-        .skipUntil Bacon.fromEventTarget @process.stdout, 'readable'
-        .scan '', (last, chunk) ->
-          split = chunk.split BLOCK_SEPARATOR
-          if split.length > 1
-            _.first split
+        .map (chunk) -> chunk.toString()
+        .filter (x) -> x?
         .scan {code:[],wip:''}, (last, chunk) ->
-          split = last.wip + chunk.split BLOCK_SEPARATOR
-          if split.length > 1
+          newCode = last.wip + chunk
+          if newCode.indexOf(BLOCK_SEPARATOR) is -1
+            return {
+              code: []
+              wip: newCode
+            }
+          split = newCode.split BLOCK_SEPARATOR
+          {
             code: _.first split, split.length - 1
             wip: _.last split
-          else
-            code: []
-            wip: split[0]
+          }
+        .log 'scanned'
         .flatMap (codes) -> Bacon.fromArray codes.code
-        .map (x) -> console.log x; x
-        .onValue (code) => @evaluate code
+        .map (json) ->
+          try
+            JSON.parse(json)
+          catch err
+            Bacon.error json
     )
     @emitter.emit('ready')
-  kill: (signal) -> @process.kill signal
+  kill: (signal) ->
+    if @process?
+      @detachProcess()
+      @process.kill signal
+      delete @process
+      delete @_detach
+      @emit 'killed'
+  start: ->
+    @createProcess()
+  stop: ->
+    @kill()
   restart: ->
+    @stop()
+    @start()
   detachProcess: ->
-    @process
+    @_detach()
   evaluate: (code) ->
+    @emit 'output', code
+  send: (code) ->
+    console.log "#{code}\u2417"
+    @process.stdin.write(code+BLOCK_SEPARATOR)
