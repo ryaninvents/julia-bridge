@@ -4,7 +4,7 @@ sinon = require 'sinon'
 JuliaProcess = require '../../index'
 
 describe 'JuliaProcess', ->
-  @timeout(30000)
+  @timeout(60000)
   describe 'constructor', ->
     it 'should create a new Julia process', ->
       @process = new JuliaProcess()
