@@ -82,9 +82,10 @@ class JuliaProcess extends Bacon.Bus
   detachProcess: ->
     @_detach()
   evaluate: (code) ->
-    if code.data.length
+    console.log code
+    if code?.data?.length
       @emit.apply @, _.flatten [code.event, code.data]
     else
-      @emit code.event
+      @emit code?.event ? 'noop'
   send: (code) ->
     @process.stdin.write(code+BLOCK_SEPARATOR)
