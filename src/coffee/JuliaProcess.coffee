@@ -30,13 +30,18 @@ class JuliaProcess extends Bacon.Bus
         .map => @
     if startImmediately
       process.nextTick => @createProcess()
+    @onValue (value) => @evaluate value
   createProcess: ->
+
+    # The Julia process that will actually run our code.
     @process = spawn @juliaPath, [
       '--no-startup'
       path.resolve __dirname, '../julia/JavaScriptBridge.jl'
     ],
       cwd: process.cwd()
 
+    # `@_detach` is the unsubscribe method for this
+    # process's stdout stream
     @_detach = @plug (
       Bacon.fromEventTarget @process.stdout, 'data'
         .map (chunk) -> chunk.toString()
@@ -53,15 +58,13 @@ class JuliaProcess extends Bacon.Bus
             code: _.first split, split.length - 1
             wip: _.last split
           }
-        .log 'scanned'
         .flatMap (codes) -> Bacon.fromArray codes.code
         .map (json) ->
           try
             JSON.parse(json)
           catch err
-            Bacon.error json
+            new Bacon.Error json
     )
-    @emitter.emit('ready')
   kill: (signal) ->
     if @process?
       @detachProcess()
@@ -79,7 +82,9 @@ class JuliaProcess extends Bacon.Bus
   detachProcess: ->
     @_detach()
   evaluate: (code) ->
-    @emit 'output', code
+    if code.data.length
+      @emit.apply @, _.flatten [code.event, code.data]
+    else
+      @emit code.event
   send: (code) ->
-    console.log "#{code}\u2417"
     @process.stdin.write(code+BLOCK_SEPARATOR)

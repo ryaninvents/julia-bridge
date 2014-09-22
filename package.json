@@ -4,7 +4,7 @@
   "description": "Julia-JavaScript bridge",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha --require coffee-script/register --reporter dot test/coffee/**/*.spec.coffee"
+    "test": "node_modules/.bin/mocha --require coffee-script/register test/coffee/**/*.spec.coffee"
   },
   "keywords": [
     "julia",

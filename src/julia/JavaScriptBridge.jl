@@ -16,6 +16,7 @@ while true
   try
     code = consume(blocks)
     eval(parse(code))
+    @emit "evaluated"
   catch err
     @emit "error" string(err) code JSON.json(err)
   end
