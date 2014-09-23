@@ -11,7 +11,7 @@ getArgs = ()-> arguments
 # Unicode \\u0017 &#x2417; "End of Transmission Block"
 #
 # TODO: switch back to ETB; only using newline for testing
-BLOCK_SEPARATOR = "\n"
+BLOCK_SEPARATOR = "\u0017"
 
 module.exports =
 # # JuliaProcess

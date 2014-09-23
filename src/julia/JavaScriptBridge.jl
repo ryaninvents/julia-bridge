@@ -5,7 +5,10 @@ blocks = Task(codeBlockProducer)
 
 macro emit(event, data...)
   :(
-    println(JSON.json(["event"=>$event,"data"=>[$(data...)]]))
+    write(STDOUT, string(
+      JSON.json(["event"=>$event,"data"=>[$(data...)]]),
+      BLOCK_SEPARATOR
+    ))
   )
 end
 
