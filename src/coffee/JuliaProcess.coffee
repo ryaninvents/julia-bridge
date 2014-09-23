@@ -11,7 +11,7 @@ getArgs = ()-> arguments
 # Unicode \\u0017 &#x2417; "End of Transmission Block"
 #
 # TODO: switch back to ETB; only using newline for testing
-BLOCK_SEPARATOR = "\n"#String.fromCharCode(17)
+BLOCK_SEPARATOR = "\n"
 
 module.exports =
 # # JuliaProcess
@@ -79,10 +79,11 @@ class JuliaProcess extends Bacon.Bus
   restart: ->
     @stop()
     @start()
+  stream: (eventName) ->
+    Bacon.fromEventTarget @, eventName, getArgs
   detachProcess: ->
     @_detach()
   evaluate: (code) ->
-    console.log code
     if code?.data?.length
       @emit.apply @, _.flatten [code.event, code.data]
     else

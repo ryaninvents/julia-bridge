@@ -1,4 +1,4 @@
-const BLOCK_SEPARATOR = '\n'#char(17)
+const BLOCK_SEPARATOR = '\n'
 
 function stdinProducer()
   while true
