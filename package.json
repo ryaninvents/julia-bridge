@@ -1,6 +1,6 @@
 {
   "name": "julia-bridge",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Julia-JavaScript bridge",
   "main": "index.js",
   "scripts": {
