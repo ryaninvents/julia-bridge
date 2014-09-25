@@ -7,11 +7,15 @@ Call Julia code directly from Node.
 [![NPM package](http://img.shields.io/npm/v/julia-bridge.svg?style=flat)](https://www.npmjs.org/package/julia-bridge)
 [![Build Status](http://img.shields.io/travis/baconscript/julia-bridge.svg?branch=master&style=flat)](https://travis-ci.org/baconscript/julia-bridge)
 
-## Intended API
+## API
 
-This isn't how the code works currently, but it's where it's headed.
-Right now you have to call `julia.send()` with any multi-line code,
-because `julia.compute()` only supports single lines at the moment.
+### `compute()`
+
+Computes a value and returns it on a callback.
+
+Unfortunately you have to also subscribe to the `error`
+stream if you want errors; this does not currently deliver
+node-style callbacks (i.e. with any errors as first arg).
 
 ```coffee
 JuliaProcess = require 'julia-bridge'
@@ -42,15 +46,13 @@ julia.ready.flatMap ->
     console.log("Fibonacci value #10 = #{result}")
 ```
 
-Julia-Bridge will return full JavaScript values, not just a text
-representation of the Julia output.
+### `send()`
 
-You can also use a message-passing style if your Julia code might
-send back multiple values, or if you just want the benefits of
-decoupling:
+Sends your code to Julia. You must explicitly
+`@emit` any events that you wish to send back to Node.
 
 ```coffee
-julia.on 'message:foo', (message) ->
+julia.on 'foo', (message) ->
   console.log "Result reported: #{message}"
 
 julia.send """
