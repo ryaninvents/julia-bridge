@@ -2,6 +2,7 @@
   "name": "julia-bridge",
   "version": "0.1.1",
   "description": "Julia-JavaScript bridge",
+  "repository": "git@github.com:baconscript/julia-bridge.git",
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/mocha --require coffee-script/register test/coffee/**/*.spec.coffee"
