@@ -114,3 +114,20 @@ describe 'JuliaProcess', ->
       .onValues (result) =>
         assert.equal result, 30
         done()
+    it 'should compute the Fibonacci sequence displayed in README', (done) ->
+      @process = julia = new JuliaProcess()
+      @process.on 'error', console.log.bind console, '<error>'
+      PROGRAM = """
+        function fib(n)
+          if n <= 2
+            1
+          else
+            fib(n-1) + fib(n-2)
+          end
+        end
+        return fib(10)
+      """
+      @process.on 'ready', ->
+        julia.compute PROGRAM, (result) ->
+          assert.equal result, 55
+          done()

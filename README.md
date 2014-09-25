@@ -18,12 +18,14 @@ JuliaProcess = require 'julia-bridge'
 julia = new JuliaProcess
 
 PROGRAM = """
-  fib = (n) ->
-    if n <= 1
+  function fib(n)
+    if n <= 2
       1
     else
       fib(n-1) + fib(n-2)
-  fib(10)
+    end
+  end
+  return fib(10)
 """
 
 julia.on 'ready', ->
@@ -52,7 +54,7 @@ julia.on 'message:foo', (message) ->
   console.log "Result reported: #{message}"
 
 julia.send """
-  @send 'foo' longRunningComputation()
+  @emit 'foo' longRunningComputation()
 """
 ```
 
