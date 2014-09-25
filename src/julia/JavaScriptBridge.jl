@@ -16,9 +16,16 @@ end
 
 while true
   code = ""
+  json = ""
+  index = 0
   try
-    code = consume(blocks)
-    eval(parse(code))
+    json = consume(blocks)
+    code = JSON.parse(json)
+    index = 0
+    while index < length(code)
+      (expr, index) = parse(code, index)
+      eval(expr)
+    end
     @emit "evaluated"
   catch err
     @emit "error" string(err) code JSON.json(err)

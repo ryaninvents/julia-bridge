@@ -11,7 +11,7 @@ getArgs = ()-> arguments
 # Unicode \\u0017 &#x2417; "End of Transmission Block"
 #
 # TODO: switch back to ETB; only using newline for testing
-BLOCK_SEPARATOR = "\u0017"
+BLOCK_SEPARATOR = "\n"
 
 module.exports =
 # # JuliaProcess
@@ -84,9 +84,11 @@ class JuliaProcess extends Bacon.Bus
   detachProcess: ->
     @_detach()
   evaluate: (code) ->
+    console.log(code);
     if code?.data?.length
       @emit.apply @, _.flatten [code.event, code.data]
     else
       @emit code?.event ? 'noop'
   send: (code) ->
-    @process.stdin.write(code+BLOCK_SEPARATOR)
+    console.log "send(#{JSON.stringify code})"
+    @process.stdin.write(JSON.stringify(code)+BLOCK_SEPARATOR)
