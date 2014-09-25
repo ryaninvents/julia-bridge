@@ -95,8 +95,6 @@ describe 'JuliaProcess', ->
           y = map((x) -> x^2, x)
           @emit("yValue", y)
         """
-      @process.stream('about to parse').onValues (code) =>
-        console.log "about to parse(#{code})"
       @process.stream('yValue').onValues (a, b, c) =>
         assert.equal a, 1
         assert.equal b, 4

@@ -84,11 +84,9 @@ class JuliaProcess extends Bacon.Bus
   detachProcess: ->
     @_detach()
   evaluate: (code) ->
-    console.log(code);
     if code?.data?.length
       @emit.apply @, _.flatten [code.event, code.data]
     else
       @emit code?.event ? 'noop'
   send: (code) ->
-    console.log "send(#{JSON.stringify code})"
     @process.stdin.write(JSON.stringify(code)+BLOCK_SEPARATOR)
