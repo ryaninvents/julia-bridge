@@ -10,6 +10,8 @@ Call Julia code directly from Node.
 ## Intended API
 
 This isn't how the code works currently, but it's where it's headed.
+Right now you have to call `julia.send()` with any multi-line code,
+because `julia.compute()` only supports single lines at the moment.
 
 ```coffee
 JuliaProcess = require 'julia-bridge'
