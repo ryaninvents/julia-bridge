@@ -20,6 +20,7 @@ module.exports =
 class JuliaProcess extends Bacon.Bus
   constructor: (opt) ->
     super()
+    @counter = 0
     startImmediately = opt?.startImmediately ? yes
     @juliaPath = opt?.juliaPath ? '/usr/bin/julia'
     @emitter = new EventEmitter()
@@ -88,5 +89,14 @@ class JuliaProcess extends Bacon.Bus
       @emit.apply @, _.flatten [code.event, code.data]
     else
       @emit code?.event ? 'noop'
+  compute: (code, callback) ->
+    callbackId = "computed-value-#{@counter++}"
+    code = "@emit(\"#{callbackId}\",#{code})"
+    @send code
+    if _.isFunction callback
+      @once callbackId, =>
+        callback.apply @, arguments
+    else
+      @stream callbackId
   send: (code) ->
     @process.stdin.write(JSON.stringify(code)+BLOCK_SEPARATOR)

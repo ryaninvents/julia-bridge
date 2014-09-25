@@ -100,3 +100,17 @@ describe 'JuliaProcess', ->
         assert.equal b, 4
         assert.equal c, 9
         done()
+  describe 'compute', ->
+    it 'should call the callback once it has a value', (done) ->
+      @process = new JuliaProcess()
+      @process.ready.onValue =>
+        @process.compute "5*5", (result) =>
+          assert.equal result, 25
+          done()
+    it 'should return a stream if there\'s no callback', (done) ->
+      @process = new JuliaProcess()
+      @process.ready.flatMap =>
+        @process.compute "5*6"
+      .onValues (result) =>
+        assert.equal result, 30
+        done()
