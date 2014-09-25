@@ -4,7 +4,7 @@ Call Julia code directly from Node.
 
 `npm install julia-bridge`
 
-[![NPM package](http://img.shields.io/npm/v/npm.svg?style=flat)](https://www.npmjs.org/package/julia-bridge)
+[![NPM package](http://img.shields.io/npm/v/julia-bridge.svg?style=flat)](https://www.npmjs.org/package/julia-bridge)
 [![Build Status](http://img.shields.io/travis/baconscript/julia-bridge.svg?branch=master&style=flat)](https://travis-ci.org/baconscript/julia-bridge)
 
 ## Intended API
