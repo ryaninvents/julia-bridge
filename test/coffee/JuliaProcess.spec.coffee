@@ -125,8 +125,9 @@ describe 'JuliaProcess', ->
             fib(n-1) + fib(n-2)
           end
         end
-        fib(10)
+        return fib(10)
       """
       @process.on 'ready', ->
         julia.compute PROGRAM, (result) ->
-          console.log "Fibonacci value #10 = #{result}"
+          assert.equal result, 55
+          done()

@@ -91,8 +91,8 @@ class JuliaProcess extends Bacon.Bus
       @emit code?.event ? 'noop'
   compute: (code, callback) ->
     callbackId = "computed-value-#{@counter++}"
-    code = code.replace "\n", "\n  "
-    code = "@emit(\"#{callbackId}\", @eval begin\n#{code}\nend)"
+    code = ("\n#{code}").replace /\n/g, "\n  "
+    code = "@emit \"#{callbackId}\" eval(quote\n#{code}\nend)"
     @send code
     if _.isFunction callback
       @once callbackId, =>
