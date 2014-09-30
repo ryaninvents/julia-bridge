@@ -25,6 +25,7 @@ class JuliaProcess extends Bacon.Bus
     @juliaPath = opt?.juliaPath ? '/usr/bin/julia'
     @emitter = new EventEmitter()
     _.keys(EventEmitter::).forEach (method) =>
+      return unless @emitter[method]
       @[method] = @emitter[method].bind @emitter
     ['ready','killed'].forEach (method) =>
       @[method] = Bacon.fromEventTarget @emitter, method
@@ -81,21 +82,21 @@ class JuliaProcess extends Bacon.Bus
     @stop()
     @start()
   stream: (eventName) ->
-    Bacon.fromEventTarget @, eventName, getArgs
+    Bacon.fromEventTarget @emitter, eventName, getArgs
   detachProcess: ->
     @_detach()
   evaluate: (code) ->
     if code?.data?.length
-      @emit.apply @, _.flatten [code.event, code.data]
+      @emitter.emit.apply @emitter, _.flatten [code.event, code.data]
     else
-      @emit code?.event ? 'noop'
+      @emitter.emit code?.event ? 'noop'
   compute: (code, callback) ->
     callbackId = "computed-value-#{@counter++}"
     code = ("\n#{code}").replace /\n/g, "\n  "
     code = "@emit \"#{callbackId}\" eval(quote\n#{code}\nend)"
     @send code
     if _.isFunction callback
-      @once callbackId, =>
+      @emitter.once callbackId, =>
         callback.apply @, arguments
     else
       @stream callbackId
