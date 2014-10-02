@@ -1,6 +1,6 @@
 {
   "name": "julia-bridge",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Julia-JavaScript bridge",
   "repository": "git@github.com:baconscript/julia-bridge.git",
   "main": "index.js",
