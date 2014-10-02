@@ -24,9 +24,6 @@ class JuliaProcess extends Bacon.Bus
     startImmediately = opt?.startImmediately ? yes
     @juliaPath = opt?.juliaPath ? '/usr/bin/julia'
     @emitter = new EventEmitter()
-    _.keys(EventEmitter::).forEach (method) =>
-      return unless @emitter[method]
-      @[method] = @emitter[method].bind @emitter
     ['ready','killed'].forEach (method) =>
       @[method] = Bacon.fromEventTarget @emitter, method
         .map => @
